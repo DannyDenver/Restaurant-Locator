@@ -16,6 +16,7 @@ export default class RestaurantTable extends Component<{ filteredRestaurants: Re
                 </thead>
                 <tbody>
                     {
+                        this.props.filteredRestaurants.length ?
                         this.props.filteredRestaurants.map(restaurant => {
                             return (
                                 <tr>
@@ -26,7 +27,8 @@ export default class RestaurantTable extends Component<{ filteredRestaurants: Re
                                     <td>{restaurant.genre}</td>
                                 </tr>
                             )
-                        })
+                        }) : 
+                        'No Restaurants found.'
                     }
                 </tbody>
             </table>

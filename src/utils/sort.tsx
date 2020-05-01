@@ -32,3 +32,21 @@ export function quickSort(restaurants: Restaurant[], left = 0, right = restauran
 
     return restaurants;
 }
+
+export function sortObject(object: any) {
+    let sorted: any = {},
+    key, a = [];
+
+    for (key in object) {
+        if (object.hasOwnProperty(key)) {
+            a.push(key);
+        }
+    }
+
+    a.sort();
+
+    for (let key = 0; key < a.length; key++) {
+        sorted[a[key]] = object[a[key]];
+    }
+    return sorted;
+}

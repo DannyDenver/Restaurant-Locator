@@ -49,20 +49,14 @@ class App extends Component {
       });
   }
 
-  filterByGenre = (event: any) => {
-    const genre = event.target.value;
+  dropdownChange = (event:any) => {
+    const value = event.target.value;
+    const name = event.target.name;
 
-    this.setState({
-      genreFilter: genre,
-    }, () => this.filterRestaurants());
-  }
+    var partialState: any = {};
+    partialState[name] = value;
 
-  filterByState = (event: any) => {
-    const state = event.target.value;
-
-    this.setState({
-      stateFilter: state,
-    }, () => this.filterRestaurants());
+    this.setState(partialState, () => this.filterRestaurants())
   }
 
   filterRestaurants() {
@@ -89,8 +83,7 @@ class App extends Component {
       filteredRestaurants: filteredRestaurants
     });
   }
-
-
+  
   render() {
     return (
       <div className="app">
@@ -103,8 +96,8 @@ class App extends Component {
               this.state.isLoaded ?
                 <>
                   <div className="search-and-filter">
-                    <Filter updateFilter={this.filterByGenre} currentFilter={this.state.genreFilter} options={this.genres} />
-                    <Filter updateFilter={this.filterByState} currentFilter={this.state.stateFilter} options={constants.stateAbbreviations} />
+                    <Filter updateFilter={this.dropdownChange} name={'genreFilter'} currentFilter={this.state.genreFilter} options={this.genres} />
+                    <Filter updateFilter={this.dropdownChange} name={'stateFilter'} currentFilter={this.state.stateFilter} options={constants.stateAbbreviations} />
                   </div>
                   <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />
                 </>
@@ -115,6 +108,6 @@ class App extends Component {
       </div>
     );
   }
-}
+  }
 
 export default App;

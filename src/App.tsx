@@ -9,19 +9,14 @@ import * as hashUtils from './utils/hash';
 import { Restaurant } from './models/Restaurant';
 import Spinner from './components/Spinner/Spinner';
 import { Filter } from './components/Filters';
-
-const apiUrl = " https://code-challenge.spectrumtoolbox.com/api/restaurants";
-const stateAbbreviations = [
-  'All', 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA',
-  'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA',
-  'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND',
-  'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT',
-  'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY'
-];
+import * as constants from './constants'
+require('dotenv').config()
 
 class App extends Component {
   restaurants: Restaurant[] = [];
   genres: string[] = [];
+  genresLookup: any = {};
+  stateLookup: any = {};
 
   state = {
     filteredRestaurants: [],
@@ -30,13 +25,9 @@ class App extends Component {
     genreFilter: 'All'
   }
 
-
-  genresLookup: any = {};
-  stateLookup: any = {};
-
   componentDidMount() {
-    fetch(apiUrl, { headers: { Authorization: "Api-Key q3MNxtfep8Gt", }, })
-      .then(response => response.json())
+    fetch(`${process.env.REACT_APP_API_URL}`, { headers: { Authorization: process.env.REACT_APP_SECRET_KEY as string, }, })
+      .then((response: any) => response.json())
       .then((response: Restaurant[]) => sortUtils.quickSort(response))
       .then((restaurants: Restaurant[]) => {
         this.restaurants = restaurants;
@@ -113,8 +104,7 @@ class App extends Component {
                 <>
                   <div className="search-and-filter">
                     <Filter updateFilter={this.filterByGenre} currentFilter={this.state.genreFilter} options={this.genres} />
-                    <Filter updateFilter={this.filterByState} currentFilter={this.state.stateFilter} options={stateAbbreviations} />
-
+                    <Filter updateFilter={this.filterByState} currentFilter={this.state.stateFilter} options={constants.stateAbbreviations} />
                   </div>
                   <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />
                 </>

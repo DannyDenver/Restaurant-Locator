@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
-import { Restaurant } from '../models/Restaurant'
+import React, { Component } from 'react';
+import { Restaurant } from '../../models/Restaurant';
+import './RestaurantTable.css';
 
 export default class RestaurantTable extends Component<{ filteredRestaurants: Restaurant[] }> {
     render() {

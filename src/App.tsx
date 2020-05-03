@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import RestaurantTable from './components/RestaurantTable';
+import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import Spinner from './components/Spinner/Spinner';
-import { Filter } from './components/Filters';
+import { Filter } from './components/Filter/Filter';
 
 import * as sortUtils from './utils/sort';
 import * as filterUtils from './utils/filter';
@@ -12,6 +12,7 @@ import * as hashUtils from './utils/hash';
 
 import { Restaurant } from './models/Restaurant';
 import * as constants from './constants'
+import { Search } from './components/Search/Search';
 require('dotenv').config()
 
 class App extends Component {
@@ -181,15 +182,10 @@ class App extends Component {
               this.state.isLoaded ?
                 <>
                   <div className="search-and-filter">
-                    <Filter updateFilter={this.dropdownChange} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.genresLookup)} />
-                    <Filter updateFilter={this.dropdownChange} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
-                    <form onSubmit={this.handleSearch}>
-                      <label>
-                        Search:
-                    <input type="text" name="searchTerm" onChange={this.searchTermChange} />
-                      </label>
-                    </form>
-                  </div>
+                    <Search handleSearch={this.handleSearch} searchTermChange={this.searchTermChange} />
+                    <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.genresLookup)} />
+                    <Filter updateFilter={this.dropdownChange} itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
+                    </div>
                   <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />
                 </>
                 : <Spinner />

@@ -1,9 +1,11 @@
 import React from 'react';
+import './Filter.css'
 
 export function Filter(props: any) {
     return (
         <form className="filter">
-            <select onChange={props.updateFilter} name={props.name} value={props.currentFilter}>
+            <label>Filter {props.itemType}: </label>
+            <select className={'filter'} onChange={props.updateFilter} name={props.name} value={props.currentFilter}>
                 {
                     props.options.map((option: string) => {
                         return (

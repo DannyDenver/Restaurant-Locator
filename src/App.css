@@ -1,0 +1,9 @@
+.search-and-filter {
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0px;
+    background-color: #eaeaea;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 6px;
+}

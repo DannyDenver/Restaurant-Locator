@@ -2,28 +2,38 @@ import React, { Component } from 'react';
 import './App.css';
 
 import RestaurantTable from './components/RestaurantTable';
+import Spinner from './components/Spinner/Spinner';
+import { Filter } from './components/Filters';
+
 import * as sortUtils from './utils/sort';
 import * as filterUtils from './utils/filter';
+import * as stringUtis from './utils/string';
 import * as hashUtils from './utils/hash';
 
 import { Restaurant } from './models/Restaurant';
-import Spinner from './components/Spinner/Spinner';
-import { Filter } from './components/Filters';
 import * as constants from './constants'
 require('dotenv').config()
 
 class App extends Component {
   restaurants: Restaurant[] = [];
-  genres: string[] = [];
   genresLookup: any = {};
-  stateLookup: any = {};
+  cityLookup: any = {};
+  stateLocationLookup: any = {};
+  nameLookup: any = {};
 
   state = {
     filteredRestaurants: [],
     isLoaded: false,
-    stateFilter: 'All',
-    genreFilter: 'All'
+    stateLocationFilter: "All",
+    genreFilter: "All",
+    searchTerm: ''
   }
+  get stateLocationFilter() { return this.state.stateLocationFilter }
+  get genreFilter() { return this.state.genreFilter }
+  get searchTerm() { return this.state.searchTerm }
+
+  get genreSet() { return this.state.genreFilter !== "All"};
+  get stateLocationSet() { return this.state.stateLocationFilter !== "All"};
 
   componentDidMount() {
     fetch(`${process.env.REACT_APP_API_URL}`, { headers: { Authorization: process.env.REACT_APP_SECRET_KEY as string, }, })
@@ -31,9 +41,7 @@ class App extends Component {
       .then((response: Restaurant[]) => sortUtils.quickSort(response))
       .then((restaurants: Restaurant[]) => {
         this.restaurants = restaurants;
-        this.genresLookup = hashUtils.hashGenres(this.restaurants);
-        this.genres = Object.keys(this.genresLookup);
-        this.stateLookup = hashUtils.hashState(restaurants);
+        this.setLookupMaps();
 
         setTimeout(() => {
           this.setState({
@@ -49,41 +57,118 @@ class App extends Component {
       });
   }
 
-  dropdownChange = (event:any) => {
+  setLookupMaps() {
+    for (let index = 0; index < this.restaurants.length; index++) {
+      let restaurant = this.restaurants[index];
+      let name = stringUtis.cleanString(restaurant.name);
+      let genres = restaurant.genre.split(",");
+      let state = restaurant.state;
+      let city = stringUtis.cleanString(restaurant.city);
+
+      this.nameLookup = hashUtils.setHashMap(this.nameLookup, name, index)
+      this.stateLocationLookup = hashUtils.setHashMap(this.stateLocationLookup, state, index)
+      this.cityLookup = hashUtils.setHashMap(this.cityLookup, city, index);
+
+      genres.forEach((genre: string) => {
+        this.genresLookup = hashUtils.setHashMap(this.genresLookup, genre, index)
+      });
+
+      this.genresLookup['All'] = null;
+      this.genresLookup = sortUtils.sortProperties(this.genresLookup);
+    }
+  }
+
+  dropdownChange = (event: any) => {
     const value = event.target.value;
     const name = event.target.name;
 
     var partialState: any = {};
     partialState[name] = value;
 
-    this.setState(partialState, () => this.filterRestaurants())
+    this.setState(partialState, () => this.narrowDownRestaurants())
   }
 
-  filterRestaurants() {
-    let filteredRestaurants = this.restaurants;
+  searchTermChange = (event: any) => {
+    const searchTerm = stringUtis.cleanString(event.target.value);
 
-    const stateIndexes = this.state.stateFilter !== 'All' ? this.stateLookup[this.state.stateFilter] : null;
-    const genreIndexes = this.state.genreFilter !== 'All' ? this.genresLookup[this.state.genreFilter] : null;
+    this.setState({searchTerm});
+  }
 
-    if (stateIndexes && genreIndexes) {
-      filteredRestaurants = filterUtils.filterByIndexes(this.restaurants, genreIndexes, stateIndexes)
-    } else {
-      if (genreIndexes) {
-        filteredRestaurants = filterUtils.filterByIndexes(this.restaurants, genreIndexes)
-      } else if (stateIndexes) {
-        filteredRestaurants = filterUtils.filterByIndexes(this.restaurants, stateIndexes)
+  handleSearch = (event: any) => {
+    event.preventDefault();
+    this.narrowDownRestaurants();
+  }
+
+  narrowDownRestaurants() {
+    if (!this.searchTerm && !this.stateLocationSet && !this.genreSet) {
+      this.setState({
+        filteredRestaurants: this.restaurants
+      });
+
+      return;
+    }
+
+    let filterCount = 0;
+    let indexes: number[] = [];
+
+    if (this.stateLocationSet) {
+      if(this.stateLocationLookup[this.stateLocationFilter]) {
+        indexes = indexes.concat(this.stateLocationLookup[this.stateLocationFilter]);
       }
 
-      if (stateIndexes === undefined) {
-        filteredRestaurants = [];
+      filterCount++;
+    }
+
+    if (this.genreSet) {
+      if (this.genresLookup[this.genreFilter]) {
+        indexes = indexes.concat(this.genresLookup[this.genreFilter]);
+      }
+
+      filterCount++;
+    }
+
+    if (this.searchTerm) {
+      let searchResults = this.searchRestaurants();
+      indexes = indexes.concat(searchResults);
+      filterCount++;
+    }
+
+    let resultIndexes: number[] = [];
+    let indexesMap: any = {};
+
+    for (let index of indexes) {
+      indexesMap[index] = (indexesMap[index] || 0) + 1;
+      if (indexesMap[index] === filterCount) {
+        resultIndexes.push(index);
       }
     }
 
-    this.setState({
-      filteredRestaurants: filteredRestaurants
-    });
+    let filteredRestaurants = filterUtils.filterByIndexes(this.restaurants, resultIndexes);
+
+    this.setState({filteredRestaurants});
   }
-  
+
+  searchRestaurants(): number[] {
+    let indexes: number[] = [];
+
+    if(this.nameLookup[this.searchTerm]) {
+      indexes = indexes.concat(this.nameLookup[this.searchTerm]);
+    }
+
+    if(this.cityLookup[this.searchTerm]) {
+      const cityIndexes = this.cityLookup[this.searchTerm];
+      indexes = indexes.concat(cityIndexes);
+    }
+
+    let searchGenre = stringUtis.capitalize(this.searchTerm);
+    if(this.genresLookup[searchGenre]) {
+      let genreIndexes = this.genresLookup[searchGenre];
+      indexes = indexes.concat(genreIndexes);
+    }
+
+    return indexes;
+  }
+
   render() {
     return (
       <div className="app">
@@ -96,8 +181,14 @@ class App extends Component {
               this.state.isLoaded ?
                 <>
                   <div className="search-and-filter">
-                    <Filter updateFilter={this.dropdownChange} name={'genreFilter'} currentFilter={this.state.genreFilter} options={this.genres} />
-                    <Filter updateFilter={this.dropdownChange} name={'stateFilter'} currentFilter={this.state.stateFilter} options={constants.stateAbbreviations} />
+                    <Filter updateFilter={this.dropdownChange} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.genresLookup)} />
+                    <Filter updateFilter={this.dropdownChange} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
+                    <form onSubmit={this.handleSearch}>
+                      <label>
+                        Search:
+                    <input type="text" name="searchTerm" onChange={this.searchTermChange} />
+                      </label>
+                    </form>
                   </div>
                   <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />
                 </>
@@ -108,6 +199,6 @@ class App extends Component {
       </div>
     );
   }
-  }
+}
 
 export default App;

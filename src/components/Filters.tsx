@@ -7,7 +7,7 @@ export function Filter(props: any) {
                 {
                     props.options.map((option: string) => {
                         return (
-                            <option value={option}>{option}</option>
+                            <option key={option} value={option}>{option}</option>
                         )
                     })
                 }

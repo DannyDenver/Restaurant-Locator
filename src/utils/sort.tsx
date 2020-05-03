@@ -33,7 +33,7 @@ export function quickSort(restaurants: Restaurant[], left = 0, right = restauran
     return restaurants;
 }
 
-export function sortObject(object: any) {
+export function sortProperties(object: any) {
     let sorted: any = {},
     key, a = [];
 

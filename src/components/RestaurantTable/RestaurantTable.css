@@ -25,3 +25,29 @@ tbody tr:hover {background-color: #ddd;}
     font-size: 22px;
     margin-top: 20px;
 }
+
+.nav-arrow {
+    height: 25px;
+    width: 50px;
+}
+
+.nav-arrow.right {
+    transform: rotate(180deg);
+}
+
+.paginator {
+    margin: 20px auto;
+}
+
+.paginator-number {
+    display: inline;
+    font-size: 25px;
+}
+
+button {
+    letter-spacing: inherit;
+    text-align: left;
+    background: none;
+    cursor: pointer;
+    border: none;
+}

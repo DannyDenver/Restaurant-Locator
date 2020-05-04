@@ -174,7 +174,7 @@ class App extends Component {
                     <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
                     <Filter updateFilter={this.dropdownChange} itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
                     </div>
-                  <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />
+                  <RestaurantTable restaurants={this.state.filteredRestaurants} />
                 </>
                 : <Spinner />
             }

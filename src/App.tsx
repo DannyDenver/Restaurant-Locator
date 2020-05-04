@@ -92,7 +92,11 @@ class App extends Component {
 
   searchTermChange = (event: any) => {
     const searchTerm = stringUtis.cleanString(event.target.value);
-    this.setState({searchTerm});
+    this.setState({searchTerm}, () => {
+      if(!this.searchTerm) {
+        this.narrowDownRestaurants();
+      }
+    });
   }
 
   handleSearch = (event: any) => {

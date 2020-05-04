@@ -3,8 +3,13 @@ import './Search.css';
 
 export function Search(props: any) {
     return (
-        <form className={"search-form"} onSubmit={props.handleSearch}>
-            <input type="text" placeholder="Search.." name="searchTerm" onChange={props.searchTermChange} />
-        </form>
+        <div className="search-wrapper">
+            <form className="search-form" onSubmit={props.handleSearch}>
+                <input type="text" placeholder="Search..." value={props.searchTerm} onChange={props.searchTermChange} />
+                {
+                    props.searchTerm ? (<button className="close-icon no-select" type="reset" value={''} onClick={ props.searchTermChange }></button>) : null
+                }
+            </form>
+        </div>
     )
 }

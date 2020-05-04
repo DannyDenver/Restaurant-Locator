@@ -181,7 +181,7 @@ class App extends Component {
               this.state.isLoaded ?
                 <>
                   <div className="search-and-filter">
-                    <Search handleSearch={this.handleSearch} searchTermChange={this.searchTermChange} />
+                    <Search handleSearch={this.handleSearch} searchTerm={this.state.searchTerm} searchTermChange={this.searchTermChange} />
                     <Switch label={'Filters Enabled'} name={'RestaurantFiltersEnabled'} checked={this.state.filtersEnabled} onChange={this.toggleFilters }/>
                     <Filter updateFilter={this.dropdownChange} enabled={this.state.filtersEnabled} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
                     <Filter updateFilter={this.dropdownChange} enabled={this.state.filtersEnabled}  itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />

@@ -1,9 +1,9 @@
-.search-form {
+.close-icon,.search-wrapper {
+	position: relative;
     margin: 5px 10px;
 }
-
 input[type=text] {
-    width: 100%;
+    width: 300px;
     box-sizing: border-box;
     border: 2px solid #ccc;
     border-radius: 4px;
@@ -12,5 +12,30 @@ input[type=text] {
     background-image: url(https://img.icons8.com/android/18/000000/search.png);
     background-position: 10px 10px;
     background-repeat: no-repeat;
-    padding: 8px 20px 8px 40px;
-  }
+	padding: 8px 20px 8px 40px;
+}
+
+.close-icon {
+	border: 1px solid transparent;
+    top: 12px;
+    position: absolute;
+    cursor: pointer;
+}
+.close-icon:after {
+	content: "X";
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	background-color: grey;
+	opacity: .5;
+	right: 35px;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	padding: 2px;
+	border-radius: 50%;
+	text-align: center;
+	color: white;
+	font-size: 12px;
+	cursor: pointer;
+}

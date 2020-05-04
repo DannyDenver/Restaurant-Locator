@@ -14,6 +14,7 @@ import { Restaurant } from './models/Restaurant';
 import * as constants from './constants'
 import { Search } from './components/Search/Search';
 import { LookupTables } from './models/LookupTables';
+import { Switch } from './components/Switch/Switch';
 require('dotenv').config()
 
 class App extends Component {
@@ -23,6 +24,7 @@ class App extends Component {
   state = {
     filteredRestaurants: [],
     isLoaded: false,
+    filtersEnabled: false,
     stateLocationFilter: "All",
     genreFilter: "All",
     searchTerm: ''
@@ -31,8 +33,8 @@ class App extends Component {
   get genreFilter() { return this.state.genreFilter }
   get searchTerm() { return this.state.searchTerm }
 
-  get genreSet() { return this.state.genreFilter !== "All"};
-  get stateLocationSet() { return this.state.stateLocationFilter !== "All"};
+  get genreSet() { return this.state.genreFilter !== "All" && this.state.filtersEnabled};
+  get stateLocationSet() { return this.state.stateLocationFilter !== "All" && this.state.filtersEnabled};
 
   componentDidMount() {
     fetch(`${process.env.REACT_APP_API_URL}`, { headers: { Authorization: process.env.REACT_APP_SECRET_KEY as string, }, })
@@ -104,6 +106,15 @@ class App extends Component {
     this.narrowDownRestaurants();
   }
 
+  toggleFilters = (event:any) => {
+    const enabled = !this.state.filtersEnabled;
+    this.setState({filtersEnabled: enabled }, () =>{
+      if(this.state.genreFilter || this.state.stateLocationFilter) {
+        this.narrowDownRestaurants();
+      }
+    });
+  }
+
   narrowDownRestaurants() {
     if (!this.searchTerm && !this.stateLocationSet && !this.genreSet) {
       this.setState({
@@ -171,8 +182,9 @@ class App extends Component {
                 <>
                   <div className="search-and-filter">
                     <Search handleSearch={this.handleSearch} searchTermChange={this.searchTermChange} />
-                    <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
-                    <Filter updateFilter={this.dropdownChange} itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
+                    <Switch label={'Filters Enabled'} name={'RestaurantFiltersEnabled'} checked={this.state.filtersEnabled} onChange={this.toggleFilters }/>
+                    <Filter updateFilter={this.dropdownChange} enabled={this.state.filtersEnabled} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
+                    <Filter updateFilter={this.dropdownChange} enabled={this.state.filtersEnabled}  itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
                     </div>
                   <Table items={this.state.filteredRestaurants} columns={constants.restaurantColumns} rowsPerPage={10} rowKey="telephone" />
                 </>

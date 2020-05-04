@@ -19,3 +19,9 @@ th:nth-child(5) {
 }
 
 tbody tr:hover {background-color: #ddd;}
+
+.no-results {
+    text-align: center;
+    font-size: 22px;
+    margin-top: 20px;
+}

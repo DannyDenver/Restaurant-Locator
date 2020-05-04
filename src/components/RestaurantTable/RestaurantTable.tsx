@@ -30,7 +30,7 @@ export default class RestaurantTable extends Component<{ filteredRestaurants: Re
                                 )
                             }) :
                             <tr>
-                                <td colSpan={5}>{'No Restaurants found.'}</td>
+                                <td className="no-results" colSpan={5}>{'No Restaurants found.'}</td>
                             </tr>
                     }
                 </tbody>

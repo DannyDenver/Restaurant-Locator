@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import RestaurantTable from './components/RestaurantTable/RestaurantTable';
+import Table from './components/Table/Table';
 import Spinner from './components/Spinner/Spinner';
 import { Filter } from './components/Filter/Filter';
 
@@ -174,7 +174,7 @@ class App extends Component {
                     <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
                     <Filter updateFilter={this.dropdownChange} itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
                     </div>
-                  <RestaurantTable restaurants={this.state.filteredRestaurants} />
+                  <Table items={this.state.filteredRestaurants} columns={constants.restaurantColumns} rowsPerPage={10} rowKey="telephone" />
                 </>
                 : <Spinner />
             }

@@ -9,3 +9,11 @@ export function setHashMap(hashMap: any, key: string, index: number) {
 
   return copyHash;
 }
+
+export function addIndexes(lookupTable: any, value: string, indexes: number[]) {
+  if (lookupTable[value]) {
+    indexes = indexes.concat(lookupTable[value]);
+  }
+
+  return indexes;
+}

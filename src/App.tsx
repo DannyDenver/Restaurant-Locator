@@ -13,14 +13,12 @@ import * as hashUtils from './utils/hash';
 import { Restaurant } from './models/Restaurant';
 import * as constants from './constants'
 import { Search } from './components/Search/Search';
+import { LookupTables } from './models/LookupTables';
 require('dotenv').config()
 
 class App extends Component {
   restaurants: Restaurant[] = [];
-  genresLookup: any = {};
-  cityLookup: any = {};
-  stateLocationLookup: any = {};
-  nameLookup: any = {};
+  lookupTables = new LookupTables();
 
   state = {
     filteredRestaurants: [],
@@ -42,7 +40,7 @@ class App extends Component {
       .then((response: Restaurant[]) => sortUtils.quickSort(response))
       .then((restaurants: Restaurant[]) => {
         this.restaurants = restaurants;
-        this.setLookupMaps();
+        this.lookupTables =  this.setLookupTables(this.restaurants);
 
         setTimeout(() => {
           this.setState({
@@ -58,25 +56,28 @@ class App extends Component {
       });
   }
 
-  setLookupMaps() {
-    for (let index = 0; index < this.restaurants.length; index++) {
+  setLookupTables(restaurants: Restaurant[]): LookupTables {
+    const lookupTables: LookupTables = new LookupTables();
+
+    for (let index = 0; index < restaurants.length; index++) {
       let restaurant = this.restaurants[index];
       let name = stringUtis.cleanString(restaurant.name);
       let genres = restaurant.genre.split(",");
       let state = restaurant.state;
       let city = stringUtis.cleanString(restaurant.city);
 
-      this.nameLookup = hashUtils.setHashMap(this.nameLookup, name, index)
-      this.stateLocationLookup = hashUtils.setHashMap(this.stateLocationLookup, state, index)
-      this.cityLookup = hashUtils.setHashMap(this.cityLookup, city, index);
+      lookupTables.name = hashUtils.setHashMap(lookupTables.name, name, index)
+      lookupTables.state = hashUtils.setHashMap(lookupTables.state, state, index)
+      lookupTables.city = hashUtils.setHashMap(lookupTables.city, city, index);
 
       genres.forEach((genre: string) => {
-        this.genresLookup = hashUtils.setHashMap(this.genresLookup, genre, index)
+        lookupTables.genre = hashUtils.setHashMap(lookupTables.genre, genre, index)
       });
-
-      this.genresLookup['All'] = null;
-      this.genresLookup = sortUtils.sortProperties(this.genresLookup);
     }
+    lookupTables.genre['All'] = null;
+    lookupTables.genre = sortUtils.sortProperties(lookupTables.genre);
+
+    return lookupTables;
   }
 
   dropdownChange = (event: any) => {
@@ -91,7 +92,6 @@ class App extends Component {
 
   searchTermChange = (event: any) => {
     const searchTerm = stringUtis.cleanString(event.target.value);
-
     this.setState({searchTerm});
   }
 
@@ -113,18 +113,12 @@ class App extends Component {
     let indexes: number[] = [];
 
     if (this.stateLocationSet) {
-      if(this.stateLocationLookup[this.stateLocationFilter]) {
-        indexes = indexes.concat(this.stateLocationLookup[this.stateLocationFilter]);
-      }
-
+      indexes = hashUtils.addIndexes(this.lookupTables.state, this.stateLocationFilter, indexes);
       filterCount++;
     }
 
     if (this.genreSet) {
-      if (this.genresLookup[this.genreFilter]) {
-        indexes = indexes.concat(this.genresLookup[this.genreFilter]);
-      }
-
+      indexes = hashUtils.addIndexes(this.lookupTables.genre, this.genreFilter, indexes);
       filterCount++;
     }
 
@@ -151,21 +145,11 @@ class App extends Component {
 
   searchRestaurants(): number[] {
     let indexes: number[] = [];
-
-    if(this.nameLookup[this.searchTerm]) {
-      indexes = indexes.concat(this.nameLookup[this.searchTerm]);
-    }
-
-    if(this.cityLookup[this.searchTerm]) {
-      const cityIndexes = this.cityLookup[this.searchTerm];
-      indexes = indexes.concat(cityIndexes);
-    }
-
     let searchGenre = stringUtis.capitalize(this.searchTerm);
-    if(this.genresLookup[searchGenre]) {
-      let genreIndexes = this.genresLookup[searchGenre];
-      indexes = indexes.concat(genreIndexes);
-    }
+
+    indexes = hashUtils.addIndexes(this.lookupTables.genre, searchGenre, indexes);
+    indexes = hashUtils.addIndexes(this.lookupTables.name, this.searchTerm, indexes);
+    indexes = hashUtils.addIndexes(this.lookupTables.city, this.searchTerm, indexes);
 
     return indexes;
   }
@@ -183,7 +167,7 @@ class App extends Component {
                 <>
                   <div className="search-and-filter">
                     <Search handleSearch={this.handleSearch} searchTermChange={this.searchTermChange} />
-                    <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.genresLookup)} />
+                    <Filter updateFilter={this.dropdownChange} itemType={'Genre'} name={'genreFilter'} currentFilter={this.genreFilter} options={Object.keys(this.lookupTables.genre)} />
                     <Filter updateFilter={this.dropdownChange} itemType={'State'} name={'stateLocationFilter'} currentFilter={this.stateLocationFilter} options={constants.stateAbbreviations} />
                     </div>
                   <RestaurantTable filteredRestaurants={this.state.filteredRestaurants} />

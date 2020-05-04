@@ -1,6 +1,5 @@
 import { TableColumn } from "./models/TableColumn";
 
-
 export const stateAbbreviations = [
     'All', 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA',
     'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA',
@@ -14,4 +13,3 @@ export const stateAbbreviations = [
                                   new TableColumn('State', 'state', '10vw'),
                                   new TableColumn('Phone Number', 'telephone', '15vw'),
                                   new TableColumn('Genre', 'genre', '35vw')];
-                                  

@@ -40,38 +40,40 @@ export default class Table extends React.Component<{ items: any[], columns: Tabl
     render() {
         return (
             <>
-                <table className="data-table">
-                    <thead>
-                        <tr>
+                <div className="table-container">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                {
+                                    Array.from(this.props.columns).map(column => {
+                                        return (<th key={column.header} style={{ width: column.columnWidth }} >{column.header}</th>)
+                                    })
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
                             {
-                                Array.from(this.props.columns).map(column => {
-                                    return (<th key={column.header} style={{ width: column.columnWidth }} >{column.header}</th>)
-                                })
+                                this.props.items.length ?
+                                    this.props.items.slice(this.startingIndex, this.startingIndex + this.props.rowsPerPage).map(item => {
+                                        return (
+                                            (<tr key={item[this.props.rowKey]}>
+                                                {
+                                                    Array.from(this.props.columns).map(column => {
+                                                        return (<td key={item[this.props.rowKey] + item[column.property]}>
+                                                            {item[column.property]}
+                                                        </td>)
+                                                    })
+                                                }
+                                            </tr>)
+                                        )
+                                    }) :
+                                    <tr>
+                                        <td className="no-results" colSpan={5}>{'No results found.'}</td>
+                                    </tr>
                             }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.props.items.length ?
-                                this.props.items.slice(this.startingIndex, this.startingIndex + this.props.rowsPerPage).map(item => {
-                                    return (
-                                        (<tr key={item[this.props.rowKey]}>
-                                            {
-                                                Array.from(this.props.columns).map(column => {
-                                                    return (<td key={item[this.props.rowKey] + item[column.property]}>
-                                                        {item[column.property]}
-                                                    </td>)
-                                                })
-                                            }
-                                        </tr>)
-                                    )
-                                }) :
-                                <tr>
-                                    <td className="no-results" colSpan={5}>{'No results found.'}</td>
-                                </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
                 {
                     this.props.items.length ?
                         (<div className="flex-container">

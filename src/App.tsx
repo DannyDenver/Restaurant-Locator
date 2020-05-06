@@ -165,7 +165,7 @@ class App extends Component {
 
     indexes = hashUtils.addIndexes(this.lookupTables.genre, searchGenre, indexes);
     indexes = hashUtils.addIndexes(this.lookupTables.name, stringUtils.cleanString(this.searchTerm), indexes);
-    indexes = hashUtils.addIndexes(this.lookupTables.city, this.searchTerm, indexes);
+    indexes = hashUtils.addIndexes(this.lookupTables.city, stringUtils.cleanString(this.searchTerm), indexes);
 
     return indexes;
   }

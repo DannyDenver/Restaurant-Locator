@@ -7,7 +7,7 @@ import { Filter } from './components/Filter/Filter';
 
 import * as sortUtils from './utils/sort';
 import * as filterUtils from './utils/filter';
-import * as stringUtis from './utils/string';
+import * as stringUtils from './utils/string';
 import * as hashUtils from './utils/hash';
 
 import { Restaurant } from './models/Restaurant';
@@ -63,10 +63,10 @@ class App extends Component {
 
     for (let index = 0; index < restaurants.length; index++) {
       let restaurant = this.restaurants[index];
-      let name = stringUtis.cleanString(restaurant.name);
+      let name = stringUtils.cleanString(restaurant.name);
       let genres = restaurant.genre.split(",");
       let state = restaurant.state;
-      let city = stringUtis.cleanString(restaurant.city);
+      let city = stringUtils.cleanString(restaurant.city);
 
       lookupTables.name = hashUtils.setHashMap(lookupTables.name, name, index)
       lookupTables.state = hashUtils.setHashMap(lookupTables.state, state, index)
@@ -76,6 +76,7 @@ class App extends Component {
         lookupTables.genre = hashUtils.setHashMap(lookupTables.genre, genre, index)
       });
     }
+
     lookupTables.genre['All'] = null;
     lookupTables.genre = sortUtils.sortProperties(lookupTables.genre);
 
@@ -93,7 +94,7 @@ class App extends Component {
   }
 
   searchTermChange = (event: any) => {
-    const searchTerm = stringUtis.cleanString(event.target.value);
+    const searchTerm = event.target.value;
     this.setState({searchTerm}, () => {
       if(!this.searchTerm) {
         this.narrowDownRestaurants();
@@ -109,7 +110,7 @@ class App extends Component {
   toggleFilters = (event:any) => {
     const enabled = !this.state.filtersEnabled;
     this.setState({filtersEnabled: enabled }, () =>{
-      if(this.state.genreFilter || this.state.stateLocationFilter) {
+      if(this.genreFilter || this.stateLocationFilter) {
         this.narrowDownRestaurants();
       }
     });
@@ -160,10 +161,10 @@ class App extends Component {
 
   searchRestaurants(): number[] {
     let indexes: number[] = [];
-    let searchGenre = stringUtis.capitalize(this.searchTerm);
+    let searchGenre = stringUtils.capitalize(this.searchTerm);
 
     indexes = hashUtils.addIndexes(this.lookupTables.genre, searchGenre, indexes);
-    indexes = hashUtils.addIndexes(this.lookupTables.name, this.searchTerm, indexes);
+    indexes = hashUtils.addIndexes(this.lookupTables.name, stringUtils.cleanString(this.searchTerm), indexes);
     indexes = hashUtils.addIndexes(this.lookupTables.city, this.searchTerm, indexes);
 
     return indexes;

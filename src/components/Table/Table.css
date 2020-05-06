@@ -1,5 +1,9 @@
 tbody tr:hover {background-color: #ddd;}
 
+thead {
+    text-align: left;
+}
+
 .table-container {
     min-height: 260px;
 }
